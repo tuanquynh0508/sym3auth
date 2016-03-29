@@ -46,7 +46,7 @@ class UserCommand extends ContainerAwareCommand
         $email = $input->getArgument('email');
 
         $container = $this->getContainer();
-        $userRepository = $container->get('tuan_quynh_user.repository.user');
+        $em = $container->get('doctrine')->getEntityManager('default');
         $passwordEncoder = $container->get('security.password_encoder');
 
         $user = new User();
@@ -55,7 +55,8 @@ class UserCommand extends ContainerAwareCommand
         $user->setPassword($password);
         $user->setEmail($email);
 
-        $userRepository->persistAndFlush($user);
+        $em->persist($user);
+        $em->flush();
 
         $output->writeln('Create User Successful.');
     }
