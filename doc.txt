@@ -1,0 +1,86 @@
+ln -s /home/nntuan/Gits/sym3auth/vendor /home/nntuan/Gits/sym3auth/lession1/vendor
+ln -s /home/nntuan/Gits/sym3auth/vendor /home/nntuan/Gits/sym3auth/lession2/vendor
+============================================================
+php bin/console
+php bin/console cache:clear --env=dev
+
+php bin/console assets:install --symlink web
+php bin/console assetic:dump --env=dev
+
+php bin/console doctrine:migrations:diff --env=dev
+php bin/console doctrine:migrations:migrate 20160321225157 --env=dev
+
+php bin/console generate:bundle --namespace=TuanQuynh/UserBundle --dir=src --format=annotation --no-interaction
+
+php bin/console doctrine:generate:entities AppBundle/Entity/User
+php bin/console doctrine:schema:update --force
+
+php bin/console tuanquynh:user:create admin 123 test1@gmail.com
+============================================================
+<VirtualHost *:80>
+    ServerName symauth-lession1.local
+    ServerAlias symauth-lession1.local
+    DocumentRoot /home/nntuan/Gits/sym3auth/lession1/web
+    SetEnv sfEnv dev
+    <Directory /home/nntuan/Gits/sym3auth/lession1/web>
+        #Options Indexes FollowSymLinks
+        AllowOverride all
+        Require all granted
+        <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(.*)$ app_dev.php [QSA,L]
+            RewriteCond %{HTTP:Authorization} ^(.*)
+            RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+        </IfModule>
+    </Directory>
+    #For Ubuntu apache config
+    ErrorLog ${APACHE_LOG_DIR}/error-symauth-lession1.log
+    CustomLog ${APACHE_LOG_DIR}/access-symauth-lession1.log combined
+
+    #For Xampp windows config
+    #ErrorLog "logs/error-symauth-lession1.log"
+    #CustomLog "logs/access-symauth-lession1.log" combined
+</VirtualHost>
+============================================================
+<VirtualHost *:80>
+    ServerName symauth-lession2.local
+    ServerAlias symauth-lession2.local
+    DocumentRoot /home/nntuan/Gits/sym3auth/lession2/web
+    SetEnv sfEnv dev
+    <Directory /home/nntuan/Gits/sym3auth/lession2/web>
+        #Options Indexes FollowSymLinks
+        AllowOverride all
+        Require all granted
+        <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(.*)$ app_dev.php [QSA,L]
+            RewriteCond %{HTTP:Authorization} ^(.*)
+            RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+        </IfModule>
+    </Directory>
+    #For Ubuntu apache config
+    ErrorLog ${APACHE_LOG_DIR}/error-symauth-lession2.log
+    CustomLog ${APACHE_LOG_DIR}/access-symauth-lession2.log combined
+
+    #For Xampp windows config
+    #ErrorLog "logs/error-symauth-lession2.log"
+    #CustomLog "logs/access-symauth-lession2.log" combined
+</VirtualHost>
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
+============================================================
