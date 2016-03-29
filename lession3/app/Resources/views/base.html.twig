@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        <p>Symfony 3 Authentication Lab - {{ app_name }}</p>
+        <ul>
+            <li>LexikJWTAuthenticationBundle</li>
+            <li>Login from database</li>
+            <li>Logout</li>
+            <li>Checking to see if a User is Logged</li>
+            <li>Hierarchical Roles</li>
+            <li>Add "Remember Me" Login Functionality</li>
+        </ul>
+        <p><strong>Reference:</strong></p>
+        <ul>
+            <li><a href="https://github.com/lexik/LexikJWTAuthenticationBundle/blob/master/Resources/doc/index.md" target="_blank">https://github.com/lexik/LexikJWTAuthenticationBundle/blob/master/Resources/doc/index.md</a></li>
+            <li><a href="http://symfony.com/doc/current/book/security.html#security-encoding-password" target="_blank">http://symfony.com/doc/current/book/security.html#security-encoding-password</a></li>
+            <li><a href="http://symfony.com/doc/current/cookbook/security/remember_me.html" target="_blank">http://symfony.com/doc/current/cookbook/security/remember_me.html</a></li>
+        </ul>
+        <hr/>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+            <a class="link" href="{{ path('logout') }}">Logout [{{ app.user.username }}]</a>
+        {% endif %}
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+         | <a class="link" href="{{ path('admin') }}">Admin</a>
+        {% endif %}
+        <hr/>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

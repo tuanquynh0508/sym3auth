@@ -1,0 +1,94 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+    encoders:
+        UserBundle\Entity\User:
+            algorithm: bcrypt
+    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    providers:
+        our_db_provider:
+            entity:
+                class: UserBundle:User
+                property: username
+
+    #http://symfony.com/doc/current/book/security.html#security-encoding-password
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api_logout:
+            pattern: ^/api/logout
+            anonymous: true
+            stateless: true
+            provider: our_db_provider
+            logout:
+                path:   /api/logout
+                target: /
+
+        api_login:
+            pattern: ^/api/login
+            stateless: true
+            provider: our_db_provider
+            anonymous: true
+            form_login:
+                check_path: /api/login_check
+                login_path: /login
+                username_parameter:       username
+                password_parameter:       password
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+                require_previous_session: false
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 604800 # 1 week in seconds
+                path:     /
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            provider: our_db_provider
+            lexik_jwt:
+                authorization_header:
+                    enabled: true
+                    prefix:  Bearer
+                    name:    Authorization
+                query_parameter:
+                    enabled: true
+                    name:    bearer
+
+        login:
+            pattern:   ^/login$
+            anonymous: ~
+
+        main:
+            pattern: ^/
+            provider: our_db_provider
+            form_login:
+                check_path: /login_check
+                login_path: /login
+            logout:
+                path:   logout # a route called logout
+                target: /login
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 604800 # 1 week in seconds
+                path:     /
+            # activate different ways to authenticate
+
+            # http_basic: ~
+            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+
+            # form_login: ~
+            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+    access_control:
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api,       roles: ROLE_ADMIN }
+        - { path: ^/login,     roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin,     roles: ROLE_SUPER_ADMIN }
+        - { path: ^/,          roles: ROLE_ADMIN }
